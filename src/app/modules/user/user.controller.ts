@@ -8,7 +8,8 @@ import sendResponse from "../../utils/sendResponse";
 const createUser = catchAsync( async (req: Request , res: Response )=>{
 
     const result = await UserServices.createUser(req.body)
-        sendResponse(res,{
+    
+    sendResponse(res,{
         success : true,
         statusCode : httpStatus.OK,
         message : "user created successfully",
@@ -29,7 +30,23 @@ const getAllUsers = catchAsync(async (req: Request , res: Response)=>{
     })
 })
 
+const updateUser = catchAsync(async (req: Request , res: Response)=>{
+
+    const userId = req.params.id
+    const verifiedToken = req.user
+    const payload = req.body
+    const result = await UserServices.updateUser(userId,payload,verifiedToken)
+
+    sendResponse(res,{
+        success : true,
+        statusCode : httpStatus.CREATED,
+        message : "user updated successfully",
+        data : result,
+    })
+})
+
 export const UserController = {
     createUser,
-    getAllUsers
+    getAllUsers,
+    updateUser
 }
