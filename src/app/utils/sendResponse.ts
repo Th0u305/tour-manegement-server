@@ -4,7 +4,6 @@ interface TMeta {
     total : number
 }
 
-
 interface TResponse<T>{
     statusCode : number;
     success : boolean,
