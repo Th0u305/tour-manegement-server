@@ -17,7 +17,7 @@ const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response
       throw new AppError(403, "No token Received");
     }
     const verifiedToken = verifyToken(accessToken,envVars.JWT_ACCESS_SECRET) as JwtPayload;
-    const isUserExist = await User.findOne({email : verifiedToken.email})
+    const isUserExist = await User.findOne({_id : verifiedToken._id})
     
     if (!isUserExist) {
       throw new AppError(httpStatus.BAD_REQUEST, "User does not already Exist")
@@ -34,8 +34,9 @@ const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response
     if (!authRoles.includes(verifiedToken.role)) {
       throw new AppError(403, "You are not permitted to view this route");
     }
-    
-    req.user = verifiedToken
+
+    req.user = verifiedToken   
+    req.headers.authorization = ""     
     next();
 
   } catch (error) {
