@@ -8,5 +8,5 @@ import { Role } from "./user.interface";
 export const UserRoutes = Router()
 
 UserRoutes.post("/register", validateRequest(createUserZodSchema), UserController.createUser)
-UserRoutes.get("/", checkAuth("ADMIN", "SUPER_ADMIN"), UserController.getAllUsers)
+UserRoutes.get("/all-users", checkAuth("ADMIN", "SUPER_ADMIN"), UserController.getAllUsers)
 UserRoutes.patch("/:id", validateRequest(updateUserZodSchema), checkAuth(...Object.values(Role)), UserController.updateUser)

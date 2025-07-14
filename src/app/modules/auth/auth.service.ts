@@ -3,8 +3,10 @@ import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import httpStatus from "http-status-codes"
 import bcryptjs from "bcryptjs"
-import { generateToken } from "../../utils/jwt";
+import { createUserToken } from "../../utils/user.token";
+import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
+
 
 const credentialsLogin = async (payload:Partial<IUser>) => {
     
@@ -22,19 +24,36 @@ const credentialsLogin = async (payload:Partial<IUser>) => {
         throw new AppError(httpStatus.BAD_REQUEST, "Incorrect password")
     }
 
-    const jwtPayload = {
-        _id : isUserExist._id,
-        email : isUserExist.email,
-        role : isUserExist.role
-    }
+    const userToken = createUserToken(isUserExist)
 
-    const accessToken = generateToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: pass , ...rest} = isUserExist
 
     return{
-        accessToken
+        accessToken: userToken.accessToken,
+        refreshToken: userToken.refreshToken,
+        user: rest
     }   
 }
 
+const resetPassword = async (oldPassword: string, newPassword: string, decodedToken: JwtPayload) =>{
+
+    const user = await User.findById(decodedToken._id)
+
+    const isOldPasswordMatch = await bcryptjs.compare(oldPassword, user?.password as string)
+
+    if (!isOldPasswordMatch) {
+        throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    user!.password = await bcryptjs.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND))
+
+    user?.save()
+}
+
+
 export const AuthServices = {
-    credentialsLogin
+    credentialsLogin,
+    resetPassword
 }

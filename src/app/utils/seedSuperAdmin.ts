@@ -27,6 +27,7 @@ export const seedSuperAdmin = async () =>{
         await User.create(payload)
 
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.log(error);
     }
 }
