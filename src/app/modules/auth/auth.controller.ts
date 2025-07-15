@@ -4,8 +4,10 @@ import { AuthServices } from "./auth.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus  from "http-status-codes";
 import AppError from "../../errorHelper/AppError";
-import { createNewAccessTokenWithRefreshToken } from "../../utils/user.token";
+import { createNewAccessTokenWithRefreshToken, createUserToken } from "../../utils/user.token";
 import { setAuthCookie } from "../../utils/setCookie";
+import { envVars } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const credentialsLogin = catchAsync( async ( req: Request, res: Response, next : NextFunction)=>{
@@ -73,7 +75,7 @@ const resetPassword = catchAsync( async ( req: Request, res: Response, next : Ne
     const newPassword = req.body.newPassword
     const decodedToken = req.user
 
-    await AuthServices.resetPassword(oldPassword, newPassword, decodedToken)
+    await AuthServices.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload)
 
     sendResponse(res,{
         success : true,
@@ -83,9 +85,32 @@ const resetPassword = catchAsync( async ( req: Request, res: Response, next : Ne
     })
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const googleCallbackController = catchAsync( async ( req: Request, res: Response, next : NextFunction)=>{
+
+    let redirectTo = req.query.state ? req.query.state as string : ""
+
+    if (redirectTo.startsWith("/")) {
+        redirectTo = redirectTo.slice(1)
+    }
+
+    const user = req.user
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found")
+    }
+
+    const tokenInfo = createUserToken(user)
+
+    setAuthCookie(res, tokenInfo)
+
+    res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`)
+})
+
 export const AuthController = {
     credentialsLogin,
     getNewAccessToken,
     logout,
-    resetPassword
+    resetPassword,
+    googleCallbackController
 }

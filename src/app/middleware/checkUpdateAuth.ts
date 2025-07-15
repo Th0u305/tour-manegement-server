@@ -17,7 +17,6 @@ const checkUpdateAuth = () => async (req: Request, res: Response, next: NextFunc
       throw new AppError(403, "No token Received");
     }
     
-    
     const verifiedToken = verifyToken(accessToken,envVars.JWT_ACCESS_SECRET) as JwtPayload;
     const isUserExist = await User.findOne({_id : verifiedToken._id})
 
