@@ -3,26 +3,44 @@ import { verifyToken } from "../utils/jwt";
 import AppError from "../errorHelper/AppError";
 import { envVars } from "../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import httpStatus from "http-status-codes"
+import { User } from "../modules/user/user.model";
+import { IsActive } from "../modules/user/user.interface";
 
-const checkAuth =
-  (...authRoles: string[]) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const accessToken = req.headers.authorization;
+const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
 
-      if (!accessToken) {
-        throw new AppError(403, "No token Received");
-      }
+  try {
 
-      const verifiedToken = verifyToken(accessToken,envVars.JWT_ACCESS_SECRET) as JwtPayload;
-
-      if (!authRoles.includes(verifiedToken.role)) {
-        throw new AppError(403, "You are not permitted to view this route");
-      }
-      req.user = verifiedToken
-      next();
-    } catch (error) {
-      next(error);
+    const accessToken = req.headers.authorization;
+    
+    if (!accessToken) {
+      throw new AppError(403, "No token Received");
     }
-  };
+    const verifiedToken = verifyToken(accessToken,envVars.JWT_ACCESS_SECRET) as JwtPayload;
+    const isUserExist = await User.findOne({_id : verifiedToken._id})
+    
+    if (!isUserExist) {
+      throw new AppError(httpStatus.BAD_REQUEST, "User does not already Exist")
+    }
+
+    if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
+      throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+    }
+
+    if (isUserExist.isDeleted) {
+      throw new AppError(httpStatus.BAD_REQUEST, "User is deleted blocked")
+    }
+
+    if (!authRoles.includes(verifiedToken.role)) {
+      throw new AppError(403, "You are not permitted to view this route");
+    }
+
+    req.user = verifiedToken   
+    req.headers.authorization = ""     
+    next();
+
+  } catch (error) {
+    next(error);
+  }
+};
 export default checkAuth;
