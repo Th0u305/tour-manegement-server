@@ -32,7 +32,7 @@ export const createNewAccessTokenWithRefreshToken = async ( refreshToken : strin
     const isUserExist = await User.findOne({email: verifyRefreshToken.email})
 
     if (!isUserExist) {
-        throw new AppError(httpStatus.BAD_REQUEST, "User does not already Exist")
+        throw new AppError(httpStatus.BAD_REQUEST, "User does not Exist")
     }
 
     if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
