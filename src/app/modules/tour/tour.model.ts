@@ -3,7 +3,7 @@ import { ITour, ITourType } from "./tour.interface";
 
 const tourTypeSchema = new Schema<ITourType>(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
   },
   {
     timestamps: true,
@@ -18,7 +18,7 @@ const tourSchema = new Schema<ITour>(
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     description: { type: String },
-    images: { type: String, default: [] },
+    images: { type: [String], default: [] },
     location: { type: String },
     constForm: { type: Number },
     startDate: { type: Date },
@@ -30,7 +30,7 @@ const tourSchema = new Schema<ITour>(
     maxGuest: { type: Number },
     minAge: { type: Number },
     division: { type: Schema.Types.ObjectId, ref: "division", required: true },
-    tourType: { type: Schema.Types.ObjectId, ref: "tourType", required: true },
+    tourType: { type: Schema.Types.ObjectId, ref: "tourType" },
   },
   {
     timestamps: true,

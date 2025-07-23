@@ -32,7 +32,7 @@ export const globalErrorHandler = (
   else if (err.name === "ZodError") {
     statusCode = 400
     message = "Zod Error"
-    err.issues.foreach((issue: any)=>{
+    err?.issues?.forEach((issue: any)=>{
       errorSources.push({
         path : issue.path[issue.path.length - 1],
         // path : issue.path.length > 1 && issue.path.reverse().join("inside"),
@@ -45,7 +45,7 @@ export const globalErrorHandler = (
   else if (err.name === "ValidationError") {
     statusCode = 400
     const errors = Object.values(err.errors)
-    errors.forEach((errorObject: any)=> errorSources.push({
+    errors?.forEach((errorObject: any)=> errorSources.push({
       path : errorObject.path,
       message : errorObject.message
     }))

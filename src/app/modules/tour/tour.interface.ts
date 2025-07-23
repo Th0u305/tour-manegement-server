@@ -20,5 +20,5 @@ export interface ITour {
   maxGuest?: number;
   minAge?: number;
   division: Types.ObjectId;
-  tourType: Types.ObjectId;
+  tourType?: Types.ObjectId;
 }
