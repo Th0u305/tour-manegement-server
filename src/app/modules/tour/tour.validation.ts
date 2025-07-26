@@ -45,6 +45,9 @@ export const createTourZodSchema = z.object({
   division: objectIdSchema, // Reusing the ObjectId validator
 
   tourType: z.string().optional(),
+
+  departureLocation : z.string().optional(),
+  arrivalLocation : z.string().optional()
 });
 
 // Zod schema for updating a tour (all fields are optional)
