@@ -29,7 +29,7 @@ export const createTourZodSchema = z.object({
   location: z.string().optional(),
   
   // Assuming 'constForm' is a typo for 'costFrom' or similar
-  costFrom: z.number().positive("Cost must be a positive number").optional(),
+  costFrom: z.number().positive("Cost must be a positive number"),
 
   startDate: z.coerce.date().optional(), // z.coerce.date() can convert string to Date
   endDate: z.coerce.date().optional(),
@@ -44,7 +44,7 @@ export const createTourZodSchema = z.object({
 
   division: objectIdSchema, // Reusing the ObjectId validator
 
-  tourType: z.string().optional(),
+  tourType: objectIdSchema,
 
   departureLocation : z.string().optional(),
   arrivalLocation : z.string().optional()
