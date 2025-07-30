@@ -77,4 +77,4 @@ tourSchema.pre("findOneAndUpdate", async function (next) {
     next()
 })
 
-export const Tour = model<ITour>("Tour", tourSchema)
+export const Tour = model<ITour>("tours", tourSchema)
