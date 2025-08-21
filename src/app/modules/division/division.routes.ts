@@ -12,5 +12,5 @@ export const DivisionRoutes = Router()
 DivisionRoutes.post("/create",checkAuth(Role.ADMIN, Role.SUPER_ADMIN),validateRequest(createDivisionSchema), multerUpload.single("file"),DivisionController.createDivision);
 DivisionRoutes.get("/", DivisionController.getAllDivisions);
 DivisionRoutes.get("/:slug", DivisionController.getSingleDivision)
-DivisionRoutes.patch("/:id",checkAuth(Role.ADMIN, Role.SUPER_ADMIN),validateRequest(updateDivisionSchema),DivisionController.updateDivision);
+DivisionRoutes.patch("/:id",checkAuth(Role.ADMIN, Role.SUPER_ADMIN), multerUpload.single("file") ,validateRequest(updateDivisionSchema),DivisionController.updateDivision);
 DivisionRoutes.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.deleteDivision);

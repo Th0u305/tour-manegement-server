@@ -22,6 +22,6 @@ TourRoutes.get("/", TourController.getAllTours);
 
 TourRoutes.post("/create",checkAuth(Role.ADMIN, Role.SUPER_ADMIN), multerUpload.array("files") , validateRequest(createTourZodSchema),TourController.createTour);
 
-TourRoutes.patch("/:id",checkAuth(Role.ADMIN, Role.SUPER_ADMIN),validateRequest(updateTourZodSchema),TourController.updateTour);
+TourRoutes.patch("/:id",checkAuth(Role.ADMIN, Role.SUPER_ADMIN), multerUpload.array("files"), validateRequest(updateTourZodSchema),TourController.updateTour);
 
 TourRoutes.delete("/:id", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.deleteTour);

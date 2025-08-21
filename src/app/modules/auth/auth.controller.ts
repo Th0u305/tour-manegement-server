@@ -91,19 +91,67 @@ const logout = catchAsync( async ( req: Request, res: Response, next : NextFunct
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const resetPassword = catchAsync( async ( req: Request, res: Response, next : NextFunction)=>{
+const resetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+    const decodedToken = req.user
+
+    await AuthServices.resetPassword(req.body, decodedToken as JwtPayload);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Password Changed Successfully",
+        data: null,
+    })
+})
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const changePassword = catchAsync( async ( req: Request, res: Response, next : NextFunction)=>{
 
     const oldPassword = req.body.oldPassword;
     const newPassword = req.body.newPassword
     const decodedToken = req.user
 
-    await AuthServices.resetPassword(oldPassword, newPassword, decodedToken as JwtPayload)
+    await AuthServices.changePassword(oldPassword, newPassword, decodedToken as JwtPayload)
 
     sendResponse(res,{
         success : true,
         statusCode : httpStatus.OK,
         message : "Password changed successfully",
         data : null
+    })
+})
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const setPassword = catchAsync( async ( req: Request, res: Response, next : NextFunction)=>{
+
+    const {password} = req.body
+    const decodedToken = req.user as JwtPayload
+
+    await AuthServices.setPassword(decodedToken.userId, password)
+
+    sendResponse(res,{
+        success : true,
+        statusCode : httpStatus.OK,
+        message : "Password changed successfully",
+        data : null
+    })
+})
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const forgotPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+
+    const { email } = req.body;
+
+    await AuthServices.forgotPassword(email);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Email Sent Successfully",
+        data: null,
     })
 })
 
@@ -134,5 +182,8 @@ export const AuthController = {
     getNewAccessToken,
     logout,
     resetPassword,
-    googleCallbackController
+    changePassword,
+    googleCallbackController,
+    setPassword,
+    forgotPassword
 }
