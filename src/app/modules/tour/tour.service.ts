@@ -38,6 +38,22 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
         throw new Error("Tour not found.");
     }
 
+    if (payload.images && payload?.images.length > 0 && existingTour.images && existingTour.images.length > 0) {
+        
+        payload.images = [...payload.images, ...existingTour.images]
+    }
+
+    if (payload.deleteImages && payload?.deleteImages.length > 0 && existingTour.images && existingTour.images.length > 0) {
+
+        const restDbImages = existingTour.images.filter((imageUrl)=> !payload.deleteImages?.includes(imageUrl))
+
+        const updatePayloadImage = (payload.images || [])
+            .filter((imageUrl)=> !payload.deleteImages?.includes(imageUrl))
+            .filter((imageUrl)=> !restDbImages?.includes(imageUrl))
+        
+        payload.images = [...restDbImages, ...updatePayloadImage]
+    }
+
     const updatedTour = await Tour.findByIdAndUpdate(id, payload, { new: true });
 
     return updatedTour;
@@ -56,9 +72,11 @@ const createTourType = async (payload: ITourType) => {
 
     return await TourType.create({ name });
 };
+
 const getAllTourTypes = async () => {
     return await TourType.find();
 };
+
 const updateTourType = async (id: string, payload: ITourType) => {
     const existingTourType = await TourType.findById(id);
     if (!existingTourType) {
@@ -68,6 +86,7 @@ const updateTourType = async (id: string, payload: ITourType) => {
     const updatedTourType = await TourType.findByIdAndUpdate(id, payload, { new: true });
     return updatedTourType;
 };
+
 const deleteTourType = async (id: string) => {
     const existingTourType = await TourType.findById(id);
     if (!existingTourType) {

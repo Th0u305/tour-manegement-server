@@ -3,13 +3,20 @@
 import { NextFunction, Request, Response } from "express";
 import { envVars } from "../config/env";
 import AppError from "../errorHelper/AppError";
+import { deleteImageFromCLoudinary } from "../config/cloudinary.config";
 
-export const globalErrorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const globalErrorHandler = async (err: any,req: Request,res: Response,next: NextFunction) => {
+
+  if (req.file) {
+    await deleteImageFromCLoudinary(req.file.path)
+  }
+
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+
+    const imageUrls = (req.files as Express.Multer.File[]).map( (file) => file.path)
+
+    await Promise.all(imageUrls.map((ulr) => deleteImageFromCLoudinary(ulr)))
+  }
 
   let statusCode = 500
   let message = `Something went wrong!!`
@@ -67,4 +74,5 @@ export const globalErrorHandler = (
     err : envVars.NODE_ENV === "development" ? err: null, 
     stack: envVars.NODE_ENV === "development" ? err.stack : null,
   });
+
 };
